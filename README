@@ -1,0 +1,12 @@
+A simple and naive script that checks given URL for cookies. It then follows randomly 10 links within domain (that are linked from provided url) to ensure that it also retrieves cookies that are set by those pages.
+
+Requirements
+============
+	
+PhantomJS - http://phantomjs.org/download.html
+
+Usage
+=====
+
+	phantomjs cookie-check.js http://www.arnes.si
+
