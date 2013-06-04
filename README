@@ -10,3 +10,11 @@ Usage
 
 	phantomjs cookie-check.js http://www.arnes.si
 
+For SSL pages you'll probably want something like this:
+
+	phantomjs --ignore-ssl-errors=true --ssl-protocol=any cookie-check.js http://www.arnes.si
+
+License
+=======
+
+	cookie-check.js is free software/open source, and is distributed under the BSD license.
