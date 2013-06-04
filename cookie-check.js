@@ -63,7 +63,7 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
                         return false; 
                     }
                     
-                    return parseURI.parse(el).host == host;
+                    return parseURI.parse(el).host === host;
                 });
 
                 to_check = (_.take(_.shuffle(links), 10));
@@ -130,7 +130,7 @@ showCookies = function (results) {
     if (output_file !== undefined) {
         fs.write(output_file, JSON.stringify(data), 'w');
     } else {
-        console.log('-------------------')
+        console.log('-------------------');
         cookie_list.forEach(function(cookie) {
             console.log(cookie.name+'('+cookie.domain+') '+cookie.value);
         });
