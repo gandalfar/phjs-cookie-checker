@@ -4,8 +4,8 @@
 
 var fs = require('fs'),
     system = require('system'),
-    parseURI = require("./jslib/parseuri.js"),
-    _ = require("./jslib/underscore-min.js");
+    parseURI = require('./jslib/parseuri.js'),
+    _ = require('./jslib/underscore-min.js');
     _.str = require('./jslib/underscore.string.min.js');
     _.mixin(_.str.exports());
 
@@ -54,6 +54,9 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
                 });
 
                 links = links.filter(function (el) {
+                    if (el.indexOf('#') > 0) {
+                        el = el.substring(0, el.indexOf('#'));
+                    }
                     var link = _(el.toLowerCase());
 
                     var donot_follow_extensions = ['jpg','jpeg','gif','png','xml','pdf','bmp','iso','zip','rar','gz','tar'];
@@ -69,7 +72,7 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
                     return parseURI.parse(el).host === host;
                 });
 
-                to_check = (_.take(_.shuffle(links), 10));
+                to_check = (_.take(_.shuffle(_.uniq(links)), 10));
                 page.close();
 
                 var wait = function(){
@@ -115,13 +118,15 @@ var getCookies = function(url, processedUrlCallback) {
 var showCookies = function (results) {
     var cookie_list = [],
         url_list = [],
-        seen_cookies = [];
+        seen_cookies = [],
+        now = Math.round(+new Date()/1000);
 
     results.forEach(function(res) {
         url_list.push(res.url);
 
         res.cookies.forEach(function (cookie) {
             if (seen_cookies.indexOf(cookie.name) === -1) {
+                cookie.now = now;
                 seen_cookies.push(cookie.name);
                 cookie_list.push(cookie);
             }
@@ -129,7 +134,7 @@ var showCookies = function (results) {
     });
 
     var data = {'urls': url_list, 'cookies': cookie_list};
-
+    
     if (output_file !== undefined) {
         fs.write(output_file, JSON.stringify(data), 'w');
     } else {
