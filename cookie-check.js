@@ -54,12 +54,9 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
                 });
 
                 links = links.filter(function (el) {
-                    if (el.indexOf('#') > 0) {
-                        el = el.substring(0, el.indexOf('#'));
-                    }
                     var link = _(el.toLowerCase());
 
-                    var donot_follow_extensions = ['jpg','jpeg','gif','png','xml','pdf','bmp','iso','zip','rar','gz','tar'];
+                    var donot_follow_extensions = ['jpg','jpeg','gif','png','xml','pdf','bmp','iso','zip','rar','gz','tar', '#'];
                     for (var k = donot_follow_extensions.length - 1; k >= 0; k--) {
                         if (link.endsWith(donot_follow_extensions[k]) === true) { 
                             return false; 
