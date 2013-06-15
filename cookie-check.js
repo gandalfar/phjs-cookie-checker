@@ -1,4 +1,6 @@
 // This is free software/open source, and is distributed under the BSD license.
+/*jshint evil:true */
+/*global phantom:false, require:false, console:false, document:false, window:false */
 
 var fs = require('fs'),
     system = require('system'),
@@ -7,17 +9,17 @@ var fs = require('fs'),
     _.str = require('./jslib/underscore.string.min.js');
     _.mixin(_.str.exports());
 
-var getRandomUrls, getCookies;
+var getRandomUrls, getCookies, initial_url;
 
 // input settings
 
 if (_(system.args[1]).startsWith('http')) {
-    var initial_url = system.args[1];
+    initial_url = system.args[1];
 } else {
     var input_settings_path = system.args[1];
     var input_settings = fs.read(input_settings_path);
     input_settings = eval( '(' + input_settings + ')' );
-    var initial_url = input_settings.url;
+    initial_url = input_settings.url;
 
     var output_file = system.args[2];
 }
@@ -28,11 +30,11 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
     var to_check = [url];
     var to_check_processed = [];
 
-    processedUrl = function(result){
+    var processedUrl = function(result){
         to_check_processed.push(result);
     };
 
-    buildLinks = function() {
+    var buildLinks = function() {
         var page = require('webpage').create();
 
         page.open(url, function (status) {
@@ -42,18 +44,19 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
             } else {
                 // https://groups.google.com/d/msg/phantomjs/lFbKlzn_k-E/bXh6a70HYKEJ
                 var links = page.evaluate(function (){
-                    var a = [];
-                    l = document.getElementsByTagName("a");
+                    var a = [],
+                        l = document.getElementsByTagName("a");
+
                     for (var i=0; i<l.length; i++) {
                         a.push(l[i].href);
                     }
                     return a;
                 });
 
-                links = links.filter(function (el, i) {
+                links = links.filter(function (el) {
                     var link = _(el.toLowerCase());
 
-                    donot_follow_extensions = ['jpg','jpeg','gif','png','xml','pdf','bmp','iso','zip','rar','gz','tar'];
+                    var donot_follow_extensions = ['jpg','jpeg','gif','png','xml','pdf','bmp','iso','zip','rar','gz','tar'];
                     for (var k = donot_follow_extensions.length - 1; k >= 0; k--) {
                         if (link.endsWith(donot_follow_extensions[k]) === true) { 
                             return false; 
@@ -69,7 +72,7 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
                 to_check = (_.take(_.shuffle(links), 10));
                 page.close();
 
-                wait = function(){
+                var wait = function(){
                     window.setTimeout(function(){
                         if (to_check.length !== to_check_processed.length) {
                             wait();    
@@ -90,9 +93,9 @@ getRandomUrls = function(url, callbackPerUrl, callbackFinal) {
     buildLinks();
 };
 
-getCookies = function(url, processedUrlCallback) {
+var getCookies = function(url, processedUrlCallback) {
     var page = require('webpage').create();
-    page.open(url, function (status) {
+    page.open(url, function () {
 
         var result = {};
         result.cookies = [];
@@ -109,10 +112,10 @@ getCookies = function(url, processedUrlCallback) {
     });
 };
 
-showCookies = function (results) {
-    cookie_list = [];
-    url_list = [];
-    seen_cookies = [];
+var showCookies = function (results) {
+    var cookie_list = [],
+        url_list = [],
+        seen_cookies = [];
 
     results.forEach(function(res) {
         url_list.push(res.url);
@@ -125,7 +128,7 @@ showCookies = function (results) {
         });
     });
 
-    data = {'urls': url_list, 'cookies': cookie_list};
+    var data = {'urls': url_list, 'cookies': cookie_list};
 
     if (output_file !== undefined) {
         fs.write(output_file, JSON.stringify(data), 'w');
